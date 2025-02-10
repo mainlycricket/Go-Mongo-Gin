@@ -1,0 +1,5 @@
+- Just to get used to the project structure, Gin and MongoDB driver APIs
+- Not developed to be useful or very sophisticated, just a simple tutorial
+- Rename `secrets.example.sh` to `secrets.sh`
+- Update variables in `secrets.sh`
+- Run commands from `Makefile` e.g. `make reset-db`, `make watch-server`
