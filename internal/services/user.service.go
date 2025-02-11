@@ -11,26 +11,26 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type IUserService interface {
-	InsertUser(ctx context.Context, user *models.User) (bson.ObjectID, error)
+type IUserDal interface {
+	InsertOne(ctx context.Context, item *models.User) (bson.ObjectID, error)
 	ReadById(ctx context.Context, id bson.ObjectID) (*models.User, error)
-	ReadAll(ctx context.Context) ([]responses.AllUserResponse, error)
 	DeleteById(ctx context.Context, id bson.ObjectID) error
+	ReadAll(ctx context.Context) ([]responses.AllUserResponse, error)
 }
 
-type userService struct {
-	dal dals.IUserDal
+type UserService struct {
+	dal IUserDal
 }
 
-func NewUserService(database *mongo.Database) IUserService {
-	userService := userService{
+func NewUserService(database *mongo.Database) *UserService {
+	userService := UserService{
 		dal: dals.NewUserDal(database),
 	}
 
 	return &userService
 }
 
-func (us *userService) InsertUser(ctx context.Context, user *models.User) (bson.ObjectID, error) {
+func (us *UserService) InsertUser(ctx context.Context, user *models.User) (bson.ObjectID, error) {
 	hashedPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return bson.NilObjectID, err
@@ -40,14 +40,14 @@ func (us *userService) InsertUser(ctx context.Context, user *models.User) (bson.
 	return us.dal.InsertOne(ctx, user)
 }
 
-func (us *userService) ReadAll(ctx context.Context) ([]responses.AllUserResponse, error) {
+func (us *UserService) ReadAll(ctx context.Context) ([]responses.AllUserResponse, error) {
 	return us.dal.ReadAll(ctx)
 }
 
-func (us *userService) ReadById(ctx context.Context, id bson.ObjectID) (*models.User, error) {
+func (us *UserService) ReadById(ctx context.Context, id bson.ObjectID) (*models.User, error) {
 	return us.dal.ReadById(ctx, id)
 }
 
-func (us *userService) DeleteById(ctx context.Context, id bson.ObjectID) error {
+func (us *UserService) DeleteById(ctx context.Context, id bson.ObjectID) error {
 	return us.dal.DeleteById(ctx, id)
 }

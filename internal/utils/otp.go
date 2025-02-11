@@ -9,7 +9,7 @@ func generateOtp(length int) string {
 	var otp string
 
 	for range length {
-		digit := rand.IntN(9)
+		digit := rand.IntN(10)
 		otp += strconv.Itoa(digit)
 	}
 

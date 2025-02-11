@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,16 +10,28 @@ import (
 	"github.com/mainlycricket/go-mongo/internal/dtos/responses"
 	"github.com/mainlycricket/go-mongo/internal/factories"
 	"github.com/mainlycricket/go-mongo/internal/services"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type IUserHandler interface {
-	GetAllUsers(c *gin.Context)
-	CreateUser(c *gin.Context)
+type IUserService interface {
+	InsertUser(ctx context.Context, user *models.User) (bson.ObjectID, error)
+	ReadById(ctx context.Context, id bson.ObjectID) (*models.User, error)
+	ReadAll(ctx context.Context) ([]responses.AllUserResponse, error)
+	DeleteById(ctx context.Context, id bson.ObjectID) error
 }
 
-func NewUserHandler(database *mongo.Database) IUserHandler {
-	handler := userHandler{
+type IUserFactory interface {
+	InsertUser(ctx context.Context, user *models.User) (bson.ObjectID, error)
+}
+
+type UserHandler struct {
+	userService IUserService
+	userFactory IUserFactory
+}
+
+func NewUserHandler(database *mongo.Database) *UserHandler {
+	handler := UserHandler{
 		userService: services.NewUserService(database),
 		userFactory: factories.NewUserFactory(database),
 	}
@@ -26,12 +39,7 @@ func NewUserHandler(database *mongo.Database) IUserHandler {
 	return &handler
 }
 
-type userHandler struct {
-	userService services.IUserService
-	userFactory factories.IUserFactory
-}
-
-func (uh *userHandler) CreateUser(g *gin.Context) {
+func (uh *UserHandler) CreateUser(g *gin.Context) {
 	var user models.User
 	var response responses.DefaultApiResponse
 
@@ -62,7 +70,7 @@ func (uh *userHandler) CreateUser(g *gin.Context) {
 	g.JSON(http.StatusCreated, response)
 }
 
-func (uh *userHandler) GetAllUsers(g *gin.Context) {
+func (uh *UserHandler) GetAllUsers(g *gin.Context) {
 	var response responses.DefaultApiResponse
 
 	users, err := uh.userService.ReadAll(g.Request.Context())

@@ -6,8 +6,13 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
+type IUserHandler interface {
+	GetAllUsers(c *gin.Context)
+	CreateUser(c *gin.Context)
+}
+
 func RegisterUserRoutes(r *gin.RouterGroup, database *mongo.Database) {
-	userHandler := handlers.NewUserHandler(database)
+	var userHandler IUserHandler = handlers.NewUserHandler(database)
 
 	userRoutes := r.Group("/users")
 	userRoutes.GET("/", userHandler.GetAllUsers)

@@ -8,12 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type IBaseDal[T any] interface {
-	InsertOne(ctx context.Context, item *T) (bson.ObjectID, error)
-	ReadById(ctx context.Context, id bson.ObjectID) (*T, error)
-	DeleteById(ctx context.Context, id bson.ObjectID) error
-}
-
 type dBContext struct {
 	database   *mongo.Database
 	collection *mongo.Collection

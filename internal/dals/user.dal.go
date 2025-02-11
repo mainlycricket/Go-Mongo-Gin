@@ -10,17 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-type IUserDal interface {
-	IBaseDal[models.User]
-	ReadAll(ctx context.Context) ([]responses.AllUserResponse, error)
-}
-
-type userDal struct {
+type UserDal struct {
 	dal[models.User]
 }
 
-func NewUserDal(database *mongo.Database) IUserDal {
-	userDal := userDal{
+func NewUserDal(database *mongo.Database) *UserDal {
+	userDal := UserDal{
 		dal: dal[models.User]{
 			dBContext: &dBContext{
 				database:   database,
@@ -32,7 +27,7 @@ func NewUserDal(database *mongo.Database) IUserDal {
 	return &userDal
 }
 
-func (ud *userDal) ReadAll(ctx context.Context) ([]responses.AllUserResponse, error) {
+func (ud *UserDal) ReadAll(ctx context.Context) ([]responses.AllUserResponse, error) {
 	opts := options.Find().SetProjection(bson.D{{Key: "password", Value: 0}})
 
 	cursor, err := ud.collection.Find(ctx, bson.D{}, opts)

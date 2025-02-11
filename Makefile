@@ -17,11 +17,11 @@ DB_NAME ?= $(DB_NAME)
 .PHONY:reset-db
 reset-db:
 	mongosh --eval "use $(DB_NAME)" --eval "db.dropDatabase()"
-	mongosh --eval "use $(DB_NAME)" --eval "load('./internal/data/models/mongo-indexes.js')"
+	mongosh --eval "use $(DB_NAME)" --eval "load('./internal/database/models/mongo-indexes.js')"
 
 .PHONY:test-code
 test-code:
 	mongosh --eval "use $(DB_NAME)_test" --eval "db.dropDatabase()"
-	mongosh --eval "use $(DB_NAME)_test" --eval "load('./internal/data/models/mongo-indexes.js')"
+	mongosh --eval "use $(DB_NAME)_test" --eval "load('./internal/database/models/mongo-indexes.js')"
 	go test -count=1 ./...
 	mongosh --eval "use $(DB_NAME)_test" --eval "db.dropDatabase()"
