@@ -1,0 +1,41 @@
+services:
+  server:
+    build:
+      target: dev-build
+      context: .
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+    env_file:
+      - ".env"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./
+        target: /app/
+
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - my_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh db:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+    
