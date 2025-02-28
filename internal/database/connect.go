@@ -15,7 +15,11 @@ func Connect(DB_URL string) (*mongo.Client, error) {
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(DB_URL).SetServerAPIOptions(serverAPI).SetMaxPoolSize(50)
+
 	client, err := mongo.Connect(opts)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := client.Ping(context.Background(), nil); err != nil {
 		return nil, err

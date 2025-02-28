@@ -2,3 +2,4 @@ secrets.sh
 /bin/*
 !/bin/.gitkeep
 .env
+Secret.yaml

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+    name: go-mongo-ingress
+    namespace: go-mongo
+    annotations:
+        kubernetes.io/ingress.class: "nginx"
+
+spec:
+    ingressClassName: nginx
+    rules:
+        - host: api.com
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: go-server-service
+                            port:
+                                number: 8080

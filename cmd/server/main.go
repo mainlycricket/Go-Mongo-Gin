@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +38,22 @@ func main() {
 }
 
 func initDB() (*mongo.Database, error) {
-	client, err := database.Connect(os.Getenv("CLUSTER_URL"))
+	host, port := os.Getenv("DB_HOST"), os.Getenv("DB_PORT")
+
+	if host == "" || port == "" {
+		return nil, errors.New("missing db env vars")
+	}
+
+	username, password := os.Getenv("MONGO_INITDB_ROOT_USERNAME"), os.Getenv("MONGO_INITDB_ROOT_PASSWORD")
+	var credentials string
+
+	if username != "" && password != "" {
+		credentials = fmt.Sprintf("%s:%s@", username, password)
+	}
+
+	DB_URL := fmt.Sprintf("mongodb://%s%s:%s", credentials, host, port)
+
+	client, err := database.Connect(DB_URL)
 	if err != nil {
 		return nil, err
 	}
